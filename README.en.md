@@ -19,3 +19,6 @@ Wikipedia pure text extractor Automatically extracts the pure text of Wikipedia 
 
 ## 💡 Applicable Scenarios:
 Academic Research | Paper Writing | Knowledge Organization | Content Creation
+
+--------------------------------------------------------------------------------------------
+@GreasyFork: https://greasyfork.org/zh-CN/scripts/527844-%E7%BB%B4%E5%9F%BA%E7%99%BE%E7%A7%91%E7%BA%AF%E5%87%80%E6%96%87%E6%9C%AC%E6%8F%90%E5%8F%96%E5%99%A8
