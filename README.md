@@ -19,6 +19,8 @@
 ## 💡 适用场景：
 学术研究｜论文写作｜知识整理｜内容创作
 
+----------------------------------------------------------------
+
 # 【维基百科文本智能提取器｜Wikipedia Text Intelligence Extractor】
 ## 🌟【维基百科学术级文本提取工具】｜Wikipedia Scholar's Toolkit
 → Automatically Extract Pure Text | Smartly Filter Ads/Links/Comments
