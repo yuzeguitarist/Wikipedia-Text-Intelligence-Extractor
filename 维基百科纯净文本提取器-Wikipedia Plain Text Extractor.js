@@ -2,7 +2,7 @@
 // @name         维基百科纯净文本提取器
 // @name         Wikipedia Plain Text Extractor
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.4
 // @description  自动提取维基百科条目正文的纯净文本(去除所有链接、注释等干扰信息)
 // @description  Automatically extract clean text from Wikipedia entries (remove all links, annotations, and other distracting information)
 // @author       Yuze
@@ -17,7 +17,7 @@
  
 (function() {
     'use strict';
- 
+
     // 立即执行的翻译阻止代码
     (function preventTranslation() {
         // 1. 添加元标记
@@ -25,11 +25,11 @@
         meta.name = 'google';
         meta.content = 'notranslate';
         document.documentElement.appendChild(meta);
- 
+
         // 2. 添加HTML属性
         document.documentElement.setAttribute('translate', 'no');
         document.documentElement.setAttribute('class', 'notranslate');
- 
+        
         // 3. 添加CSS规则阻止翻译界面
         const css = `
             .skiptranslate,
@@ -51,18 +51,18 @@
                 opacity: 0 !important;
                 pointer-events: none !important;
             }
- 
+            
             body {
                 position: static !important;
                 top: 0 !important;
                 min-height: auto !important;
             }
         `;
- 
+        
         const style = document.createElement('style');
         style.textContent = css;
         document.documentElement.appendChild(style);
- 
+
         // 4. 定期检查并移除翻译元素
         const removeTranslateElements = () => {
             const elements = document.querySelectorAll(`
@@ -78,44 +78,44 @@
                 .VIpgJd-ZVi9od-SmfZ-OEVmcd-tJHJj
             `);
             elements.forEach(el => el.remove());
- 
+
             // 移除由谷歌翻译添加的iframe
             const iframes = document.getElementsByTagName('iframe');
             for (let i = iframes.length - 1; i >= 0; i--) {
                 const iframe = iframes[i];
-                if (iframe.src.includes('translate.google') ||
+                if (iframe.src.includes('translate.google') || 
                     iframe.id.includes('goog') ||
                     iframe.className.includes('goog')) {
                     iframe.remove();
                 }
             }
         };
- 
+
         // 立即执行一次
         removeTranslateElements();
- 
+
         // 设置定期检查
         setInterval(removeTranslateElements, 1000);
- 
+
         // 5. 阻止翻译相关的脚本加载
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
-                    if (node.tagName === 'SCRIPT' &&
-                        (node.src.includes('translate.google') ||
+                    if (node.tagName === 'SCRIPT' && 
+                        (node.src.includes('translate.google') || 
                          node.src.includes('translate.googleapis'))) {
                         node.remove();
                     }
                 });
             });
         });
- 
+
         observer.observe(document.documentElement, {
             childList: true,
             subtree: true
         });
     })();
- 
+
     // 检查是否为移动版并重定向 - 最优先执行
     function redirectToDesktop() {
         const currentURL = window.location.href;
@@ -126,60 +126,22 @@
         }
         return false;
     }
- 
+
     // 如果是移动版立即重定向并返回
     if (redirectToDesktop()) {
         return; // 终止后续执行
     }
- 
-    // 添加自定义CSS来隐藏广告和通知,同时优化资源加载
+
+    // 移除所有图片屏蔽相关的代码,只保留必要的优化
     const customCSS = `
-        /* 确保左侧导航栏显示 */
-        .vector-sticky-pinned-container,
-        .vector-toc-pinned-container,
-        #mw-panel,
-        #mw-sidebar-button,
-        .vector-menu-tabs,
-        .vector-page-toolbar,
-        .vector-sticky-header-visible,
-        #vector-toc-collapsed-button,
-        .vector-menu-portal,
-        .vector-menu-content,
-        .vector-menu-portal-container,
-        #mw-navigation {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            position: static !important;
-            width: auto !important;
-            height: auto !important;
-            pointer-events: auto !important;
-            z-index: 3 !important;
+        /* 优化页面布局 */
+        #content {
+            margin: 0 auto !important;
+            max-width: 1000px !important;
+            padding: 20px !important;
         }
- 
-        /* 优化左侧导航栏样式 */
-        .vector-sticky-pinned-container {
-            position: sticky !important;
-            top: 0 !important;
-            max-height: 100vh !important;
-            overflow-y: auto !important;
-            padding-right: 10px !important;
-        }
- 
-        /* 确保父容器显示 */
-        .mw-page-container,
-        .mw-page-container-inner,
-        .vector-column-start,
-        .mw-content-container,
-        .vector-sidebar {
-            display: block !important;
-            visibility: visible !important;
-            position: relative !important;
-            width: auto !important;
-            height: auto !important;
-        }
- 
-        /* 隐藏不必要的元素,但保留导航相关元素 */
+
+        /* 隐藏不必要的元素,但保留导航和图片 */
         .banner-container,
         #siteNotice,
         .mw-indicators,
@@ -189,95 +151,41 @@
         #p-logo,
         .mw-parser-output > div:first-child:not(#toc):not(.infobox),
         [class*="banner"]:not([class*="vector"]),
-        [class*="noprint"]:not(.vector-sticky-pinned-container):not(.vector-toc-pinned-container):not([class*="vector"]),
- 
-        /* 隐藏页面底部元素 */
-        .mw-footer-container,
-        #footer-info,
-        #footer-places,
-        #footer,
-        .footer-info,
-        .footer-places,
-        #mw-footer,
-        #footer-info-lastmod,
-        #footer-info-copyright,
-        #footer-icons,
-        .printfooter,
-        .mw-footer,
-        li[id^="footer-"],
-        div[class*="footer"],
-        .minerva-footer-logo {
+        [class*="noprint"]:not(.vector-sticky-pinned-container):not(.vector-toc-pinned-container):not([class*="vector"]) {
             display: none !important;
         }
- 
-        /* 优化页面布局 */
-        #content {
-            margin: 0 auto !important;
-            max-width: 1000px !important;
-            padding: 20px !important;
-        }
- 
-        /* 确保目录可见 */
-        #vector-toc-collapsed-button,
-        .vector-toc,
-        .vector-toc-text,
-        .vector-toc-toggle,
-        .vector-toc-contents {
+
+        /* 确保导航栏显示 */
+        .vector-sticky-pinned-container,
+        .vector-column-start,
+        #mw-panel,
+        .vector-menu-portal,
+        .vector-menu-content,
+        .vector-menu-portal-container {
             display: block !important;
             visibility: visible !important;
+            opacity: 1 !important;
         }
- 
-        /* 修复可能的层级问题 */
+
+        /* 优化导航栏样式 */
+        .vector-column-start {
+            position: relative !important;
+            width: 208px !important;
+            margin: 44.8px 0 0 -12px !important;
+            font: 16px sans-serif !important;
+            color: #202122 !important;
+            float: left !important;
+        }
+
         .vector-sticky-pinned-container {
+            position: sticky !important;
+            top: 0 !important;
+            max-height: calc(100vh - 44.8px) !important;
+            overflow-y: auto !important;
             z-index: 100 !important;
         }
     `;
- 
-    // 尽早添加样式到页面
-    const style = document.createElement('style');
-    style.textContent = customCSS;
-    document.documentElement.appendChild(style);
- 
-    // 优化资源加载
-    function optimizeResourceLoading() {
-        // 移除不必要的脚本
-        const scripts = document.querySelectorAll('script[src*="analytics"], script[src*="tracking"]');
-        scripts.forEach(script => script.remove());
- 
-        // 移除预加载的资源
-        const links = document.querySelectorAll('link[rel="preload"]');
-        links.forEach(link => link.remove());
-    }
- 
-    // 添加MutationObserver持续监听并移除新添加的图片
-    const imageObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if(node.nodeName === 'IMG' ||
-                   node.nodeName === 'PICTURE' ||
-                   node.nodeName === 'FIGURE') {
-                    node.remove();
-                }
-            });
-        });
-    });
- 
-    // 添加新的MutationObserver来监听并移除捐赠相关元素
-    const donateObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((node) => {
-                if (node.nodeType === 1) { // 元素节点
-                    if (node.matches('[href*="donate.wikimedia.org"], [data-mw="interface"], .mw-portlet-personal, #p-personal, #mw-panel-sponsors')) {
-                        node.remove();
-                    }
-                    // 检查新添加元素的子元素
-                    const donateLinks = node.querySelectorAll('[href*="donate"], [class*="donate"], [id*="donate"], [class*="sponsor"], [id*="sponsor"]');
-                    donateLinks.forEach(el => el.remove());
-                }
-            });
-        });
-    });
- 
+
     // 检查是否为维基百科首页
     function isWikiMainPage() {
         const currentURL = window.location.href;
@@ -294,65 +202,37 @@
             'Special:首页',
             'Special:MainPage'
         ];
- 
+
         return mainPagePatterns.some(pattern => currentURL.includes(pattern));
     }
- 
+
     // 主程序入口
     function init() {
         // 如果是首页,直接返回不执行任何操作
         if (isWikiMainPage()) {
             return;
         }
- 
-        // 禁用自动翻译
-        disableAutoTranslate();
- 
-        // 优化资源加载
+
+        // 添加样式
+        const style = document.createElement('style');
+        style.textContent = customCSS;
+        document.documentElement.appendChild(style);
+
+        // 确保导航栏可见
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', optimizeResourceLoading);
+            document.addEventListener('DOMContentLoaded', ensureNavigationVisible);
         } else {
-            optimizeResourceLoading();
+            ensureNavigationVisible();
         }
- 
+
         // 等待主要内容加载完成后再执行提取
         if (document.readyState === 'complete') {
             initializeExtractor();
         } else {
             window.addEventListener('load', initializeExtractor);
         }
- 
-        // 启动图片监听
-        imageObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
- 
-        // 启动捐赠元素监听
-        donateObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
- 
-        // 确保导航栏显示
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', ensureNavigationVisible);
-        } else {
-            ensureNavigationVisible();
-        }
- 
-        // 添加MutationObserver来确保导航栏始终可见
-        const navigationObserver = new MutationObserver((mutations) => {
-            ensureNavigationVisible();
-        });
- 
-        navigationObserver.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true
-        });
     }
- 
+
     // 初始化提取器
     function initializeExtractor() {
         const content = document.getElementById('mw-content-text');
@@ -368,23 +248,23 @@
                     if (cleanText) createUI(cleanText);
                 }
             });
- 
+
             observer.observe(document, {
                 childList: true,
                 subtree: true
             });
         }
     }
- 
+
     // 智能文本净化处理器
     function processWikiText() {
         // 定位主要内容区域
         const content = document.getElementById('mw-content-text');
         if (!content) return null;
- 
-        // 创建克隆对象避免污染原始页面
+
+        // 创建克隆对象避免污染原始页面 
         const cleanContent = content.cloneNode(true);
- 
+
         // 智能清理不需要的元素
         const removables = [
             '.reference',         // 参考文献
@@ -420,11 +300,11 @@
             '.mw-jump-link',      // 跳转链接
             '.nomobile'          // 移动端隐藏内容
         ];
- 
+
         removables.forEach(selector => {
             cleanContent.querySelectorAll(selector).forEach(el => el.remove());
         });
- 
+
         // 深度清理嵌套链接
         cleanContent.querySelectorAll('a').forEach(link => {
             const parent = link.parentNode;
@@ -433,10 +313,10 @@
             }
             parent.removeChild(link);
         });
- 
+
         // 获取最终文本并进行智能处理
         let text = cleanContent.textContent;
- 
+        
         // 移除参看和参考资料部分
         text = text.replace(/参看[\s\S]*?(?=\n\n|$)/g, '')  // 移除参看部分
                  .replace(/参考资料[\s\S]*?(?=\n\n|$)/g, '') // 移除参考资料部分
@@ -476,28 +356,30 @@
                  .replace(/([a-zA-Z])\s*([^\x00-\xff])/g, '$1 $2') // 优化英中文之间的空格
                  .replace(/\s+/g, ' ')                       // 最终清理多余空格
                  .trim();
- 
+
         return text;
     }
- 
+
     // 创建可视化界面
     function createUI(text) {
+        // 创建面板基本结构
         const panel = document.createElement('div');
         panel.style = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 9999;
-            max-width: 400px;
+            width: 300px;
             max-height: 80vh;
-            overflow: auto;
-            font-family: '微软雅黑', sans-serif;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10000;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 15px;
         `;
- 
+
         // 创建标题容器使其可以容纳标题、按钮和语言切换器
         const titleContainer = document.createElement('div');
         titleContainer.style = `
@@ -507,11 +389,11 @@
             margin-bottom: 15px;
             gap: 10px;
         `;
- 
+
         const title = document.createElement('h3');
         title.textContent = '纯净文本提取结果';
         title.style = 'margin: 0; color: #0366d6;';
- 
+
         // 创建按钮容器
         const buttonContainer = document.createElement('div');
         buttonContainer.style = `
@@ -519,7 +401,7 @@
             gap: 10px;
             align-items: center;
         `;
- 
+
         // 创建语言切换按钮
         const langBtn = document.createElement('div');
         langBtn.style = `
@@ -529,12 +411,12 @@
             overflow: hidden;
             font-size: 14px;
         `;
- 
+
         // 获取当前URL的语言
-        const currentLang = window.location.href.includes('/zh/') ? 'zh' :
-                           window.location.href.includes('/en/') ? 'en' :
+        const currentLang = window.location.href.includes('/zh/') ? 'zh' : 
+                           window.location.href.includes('/en/') ? 'en' : 
                            window.location.hostname.startsWith('zh.') ? 'zh' : 'en';
- 
+
         // 创建中文按钮
         const zhBtn = document.createElement('span');
         zhBtn.textContent = 'ZH';
@@ -544,7 +426,7 @@
             background: ${currentLang === 'zh' ? '#0366d6' : 'transparent'};
             color: ${currentLang === 'zh' ? 'white' : '#0366d6'};
         `;
- 
+
         // 创建英文按钮
         const enBtn = document.createElement('span');
         enBtn.textContent = 'EN';
@@ -554,11 +436,11 @@
             background: ${currentLang === 'en' ? '#0366d6' : 'transparent'};
             color: ${currentLang === 'en' ? 'white' : '#0366d6'};
         `;
- 
+
         // 添加点击事件
         zhBtn.onclick = () => switchLanguage('zh');
         enBtn.onclick = () => switchLanguage('en');
- 
+
         // 创建复制按钮
         const copyBtn = document.createElement('button');
         copyBtn.textContent = '一键复制';
@@ -579,11 +461,55 @@
             copyBtn.textContent = '✓ 已复制!';
             setTimeout(() => copyBtn.textContent = '一键复制', 2000);
         };
- 
+
+        // 修改内容区域,添加分段加载功能
         const content = document.createElement('div');
-        content.textContent = text;
-        content.style = 'line-height: 1.6; color: #333;';
- 
+        content.style = 'line-height: 1.6; color: #333; overflow-y: auto; max-height: calc(80vh - 100px);';
+        
+        // 分段加载参数
+        const INITIAL_CHUNK = 1200;  // 初始加载字数
+        const CHUNK_SIZE = 600;      // 每次增加字数
+        const LOAD_INTERVAL = 250;   // 加载间隔(ms)
+        
+        // 初始显示
+        let currentPosition = 0;
+        content.textContent = text.slice(0, INITIAL_CHUNK);
+        currentPosition = INITIAL_CHUNK;
+
+        // 创建加载指示器
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.style = `
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            padding: 5px;
+            margin-top: 10px;
+        `;
+        loadingIndicator.textContent = '正在加载更多内容...';
+        content.appendChild(loadingIndicator);
+
+        // 分段加载剩余内容
+        const loadMoreContent = () => {
+            if (currentPosition >= text.length) {
+                loadingIndicator.remove();
+                return;
+            }
+
+            const nextChunk = text.slice(currentPosition, currentPosition + CHUNK_SIZE);
+            content.textContent = content.textContent.slice(0, -loadingIndicator.textContent.length) + nextChunk;
+            content.appendChild(loadingIndicator);
+            currentPosition += CHUNK_SIZE;
+
+            // 计算加载进度
+            const progress = Math.min(100, Math.round((currentPosition / text.length) * 100));
+            loadingIndicator.textContent = `正在加载更多内容... ${progress}%`;
+
+            setTimeout(loadMoreContent, LOAD_INTERVAL);
+        };
+
+        // 开始分段加载
+        setTimeout(loadMoreContent, LOAD_INTERVAL);
+
         // 组装语言切换按钮
         langBtn.append(zhBtn, enBtn);
         buttonContainer.append(langBtn, copyBtn);
@@ -591,45 +517,45 @@
         panel.append(titleContainer, content);
         document.body.appendChild(panel);
     }
- 
+
     // 语言切换函数
     function switchLanguage(targetLang) {
         // 获取当前URL
         const currentURL = window.location.href;
- 
+        
         // 检查当前是否已经是目标语言
         const isCurrentZh = currentURL.includes('zh.wikipedia.org');
         const isCurrentEn = currentURL.includes('en.wikipedia.org');
- 
+        
         // 如果当前语言和目标语言相同,则不执行任何操作
         if ((isCurrentZh && targetLang === 'zh') || (isCurrentEn && targetLang === 'en')) {
             return;
         }
- 
+
         // 首先尝试获取页面上的语言链接
         const langLinks = document.querySelectorAll('.interlanguage-link');
         for (const link of langLinks) {
-            const langCode = link.getAttribute('lang') ||
+            const langCode = link.getAttribute('lang') || 
                             link.querySelector('a').getAttribute('lang');
             if ((targetLang === 'zh' && (langCode === 'zh' || langCode === 'zh-Hans')) ||
                 (targetLang === 'en' && langCode === 'en')) {
                 // 找到目标语言的链接,直接跳转
                 const targetURL = new URL(link.querySelector('a').href);
- 
+                
                 // 添加禁止自动翻译的参数
                 targetURL.searchParams.append('notranslate', 'true');
- 
+                
                 // 跳转前先设置一个会话存储标记
                 sessionStorage.setItem('disableAutoTranslate', 'true');
- 
+                
                 window.location.href = targetURL.toString();
                 return;
             }
         }
- 
+
         // 如果没有找到语言链接,则尝试智能转换
         let newURL;
- 
+
         // 检查当前页面是否有其他语言版本的链接
         const interwikiLink = document.querySelector(`a[hreflang="${targetLang}"]`);
         if (interwikiLink) {
@@ -645,12 +571,12 @@
                 newURL = `https://en.wikipedia.org/wiki/${pageName}?notranslate=true`;
             }
         }
- 
+
         // 设置会话存储标记
         sessionStorage.setItem('disableAutoTranslate', 'true');
         window.location.href = newURL;
     }
- 
+
     // 在页面加载时禁用自动翻译
     function disableAutoTranslate() {
         if (sessionStorage.getItem('disableAutoTranslate')) {
@@ -659,18 +585,18 @@
             meta.name = 'google';
             meta.content = 'notranslate';
             document.head.appendChild(meta);
- 
+
             // 给body添加notranslate类
             document.body.classList.add('notranslate');
- 
+            
             // 设置translate属性
             document.documentElement.setAttribute('translate', 'no');
- 
+            
             // 清除会话存储标记
             sessionStorage.removeItem('disableAutoTranslate');
         }
     }
- 
+
     // 添加DOM加载完成后的检查
     function ensureNavigationVisible() {
         const navigation = document.querySelector('.vector-sticky-pinned-container');
@@ -680,7 +606,7 @@
             navigation.style.setProperty('opacity', '1', 'important');
         }
     }
- 
+
     // 启动程序
     init();
-})();
+})(); 
