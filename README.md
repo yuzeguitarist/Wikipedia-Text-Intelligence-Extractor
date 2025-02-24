@@ -5,29 +5,29 @@
 → 中英双语一键切换 | 支持移动/PC全平台
 → 论文写作神器 | 引用文献格式自动优化
 
-##✨ 核心功能：
+## ✨ 核心功能：
 ✔️ 深度净化文本 - 去除所有非内容元素（广告/导航/参考文献）
 ✔️ 智能段落优化 - 自动合并碎片段落，保留逻辑结构
 ✔️ 隐私保护 - 零数据收集，完全本地运行
 
-##🚀 技术亮点：
+## 🚀 技术亮点：
 • “专利级”DOM解析算法
 • 智能缓存机制提升3倍加载速度
 • 自适应多语言处理引擎
 • ”军用级“反检测技术绕过限制
 
-##💡 适用场景：
+## 💡 适用场景：
 学术研究｜论文写作｜知识整理｜内容创作
 
-#【维基百科文本智能提取器｜Wikipedia Text Intelligence Extractor】
-##🌟【维基百科学术级文本提取工具】｜Wikipedia Scholar's Toolkit
+# 【维基百科文本智能提取器｜Wikipedia Text Intelligence Extractor】
+## 🌟【维基百科学术级文本提取工具】｜Wikipedia Scholar's Toolkit
 → Automatically Extract Pure Text | Smartly Filter Ads/Links/Comments
 
 → One-click Switch between Chinese and English | Supports Mobile/PC Platforms
 
 → Paper Writing Master | Automatically Optimize Citation Format
 
-##✨ Core Features:
+## ✨ Core Features:
 
 ✔️ Deep Text Purification - Remove all non-content elements (ads/navigation/references)
 
@@ -35,7 +35,7 @@
 
 ✔️ Privacy Protection - Zero data collection, completely local operation
 
-##🚀 Technical Highlights:
+## 🚀 Technical Highlights:
 
 • "Patented" DOM parsing algorithm
 
@@ -45,6 +45,6 @@
 
 • "Military-grade" anti-detection technology to bypass restrictions
 
-##💡 Applicable Scenarios:
+## 💡 Applicable Scenarios:
 
 Academic Research | Paper Writing | Knowledge Organization | Content Creation
