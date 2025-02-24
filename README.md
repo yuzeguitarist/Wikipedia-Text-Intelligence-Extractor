@@ -1,3 +1,6 @@
+<a href="README.md"><button>中文</button></a>
+<a href="README.en.md"><button>English</button></a>
+
 # 【维基百科文本智能提取器｜Wikipedia Text Intelligence Extractor】
 维基百科纯净文本提取器 自动提取维基百科条目正文的纯净文本(去除所有链接、注释等干扰信息)
 
