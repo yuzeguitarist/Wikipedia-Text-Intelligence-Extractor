@@ -80,6 +80,8 @@
     composeText(root) {
       const fragments = [];
 
+      const containerTags = new Set(['DIV', 'SECTION', 'ARTICLE', 'MAIN']);
+
       const processElement = element => {
         if (!element) {
           return;
@@ -96,7 +98,24 @@
           return;
         }
 
-        if (element.tagName === 'UL' || element.tagName === 'OL') {
+        const tagName = element.tagName;
+
+        if (containerTags.has(tagName)) {
+          const directText = this.collectDirectText(element);
+          if (directText) {
+            fragments.push(directText);
+            fragments.push('');
+          }
+
+          let inner = element.firstElementChild;
+          while (inner) {
+            processElement(inner);
+            inner = inner.nextElementSibling;
+          }
+          return;
+        }
+
+        if (tagName === 'UL' || tagName === 'OL') {
           element.querySelectorAll(':scope > li').forEach(li => {
             const line = this.cleanLine(li.textContent);
             if (line) {
@@ -107,7 +126,7 @@
           return;
         }
 
-        if (element.tagName === 'DL') {
+        if (tagName === 'DL') {
           element.querySelectorAll(':scope > dt, :scope > dd').forEach(node => {
             const prefix = node.tagName === 'DT' ? '' : '  ';
             const line = this.cleanLine(node.textContent);
@@ -119,7 +138,7 @@
           return;
         }
 
-        if (BLOCK_LEVEL_TAGS.has(element.tagName)) {
+        if (BLOCK_LEVEL_TAGS.has(tagName)) {
           const cleaned = this.cleanParagraph(element.textContent);
           if (cleaned) {
             fragments.push(cleaned);
@@ -148,6 +167,19 @@
         .trim();
 
       return this.removeLineNoise(merged);
+    }
+
+    collectDirectText(element) {
+      if (!element || !element.childNodes) {
+        return '';
+      }
+
+      const directText = Array.from(element.childNodes)
+        .filter(node => node.nodeType === Node.TEXT_NODE)
+        .map(node => node.textContent)
+        .join('');
+
+      return this.cleanParagraph(directText);
     }
 
     cleanParagraph(text) {
