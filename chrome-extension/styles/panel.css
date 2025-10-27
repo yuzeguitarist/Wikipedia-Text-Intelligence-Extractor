@@ -1,0 +1,127 @@
+.wti-panel {
+  position: fixed;
+  top: 32px;
+  right: 32px;
+  width: min(420px, 40vw);
+  max-height: 80vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 24px;
+  padding: 24px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  font-family: "SF Mono", "IBM Plex Mono", "Menlo", monospace;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  z-index: 2147483647;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.wti-panel__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #fff;
+  padding-bottom: 16px;
+}
+
+.wti-panel__title-block {
+  display: grid;
+  gap: 4px;
+}
+
+.wti-panel__title {
+  margin: 0;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wti-panel__subtitle {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.6;
+}
+
+.wti-panel__controls {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 12px;
+}
+
+.wti-button {
+  appearance: none;
+  border: 1px solid #fff;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  font: inherit;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.wti-button:hover,
+.wti-button:focus {
+  background: #fff;
+  color: #000;
+}
+
+.wti-panel__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  padding: 12px 0;
+}
+
+.wti-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.wti-meta__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.7;
+}
+
+.wti-meta__value {
+  font-size: 1.1rem;
+}
+
+.wti-panel__content {
+  overflow-y: auto;
+  padding-right: 8px;
+  white-space: pre-wrap;
+  border-left: 1px solid #fff;
+  padding-left: 16px;
+}
+
+.wti-panel__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wti-panel__content::-webkit-scrollbar-thumb {
+  background: #fff;
+}
+
+.wti-panel__content::-webkit-scrollbar-track {
+  background: #000;
+}
+
+@media (max-width: 768px) {
+  .wti-panel {
+    width: calc(100vw - 32px);
+    right: 16px;
+    left: 16px;
+    top: 16px;
+  }
+}
