@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Wikipedia Monochrome Extractor",
+  "description": "Extracts clean, line-accurate text from Wikipedia using a monochrome interface.",
+  "version": "1.0.0",
+  "icons": {},
+  "permissions": [
+    "clipboardWrite"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.wikipedia.org/wiki/*",
+        "https://*.m.wikipedia.org/wiki/*"
+      ],
+      "js": [
+        "scripts/constants.js",
+        "scripts/extractor.js",
+        "scripts/ui.js",
+        "scripts/main.js"
+      ],
+      "css": [
+        "styles/panel.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
